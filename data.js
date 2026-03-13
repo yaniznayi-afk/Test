@@ -1,0 +1,77 @@
+﻿const questionsBaseData = {
+    "4_nature_easy": [
+        { type: "choice", text: "Выберите вариант с животными, которые обитают в степной зоне.", options: ["Хомяк, журавль, дрофа", "Хомяк, медведь, верблюд", "Медведь, дрофа, журавль", "Верблюд, хомяк, дрофа"], correctAnswer: "Хомяк, журавль, дрофа" },
+        { type: "choice", text: "Из перечисленных ниже растений выберите те, которые растут только в пустыне:", options: ["Ковыль", "Мох", "Мак", "Верблюжья колючка"], correctAnswer: "Верблюжья колючка" },
+        { type: "choice", text: "В какой природной зоне России самый суровый климат?", options: ["Тайга", "Тундра", "Арктические пустыни", "Субтропики"], correctAnswer: "Арктические пустыни" }
+    ],
+    "4_nature_medium": [
+        { type: "choice", image: "https://i.postimg.cc/jq8ZYZ9M/515364.png", text: "На карте Природных зон России выбери цвет той зоны, в которой зима короткая, но холодная, а лето — тёплое и засушливое.", options: ["Оранжевый", "Синий", "Зелёный", "Жёлтый"], correctAnswer: "Оранжевый" },
+        { type: "matching", text: "Сопоставь цифры с Природными зонами. От холодной до тёплой", items: ["Тайга", "Степь", "Пустыня", "Широколиственные леса", "Тундра"], correctAnswers: ["2", "4", "5", "3", "1"] },
+        { type: "text", image: "https://i.postimg.cc/jq8ZYZ9M/515364.png", text: "Рассмотри карту Природных зон России и определи в зоне какого цвета обитают следующие животные: сокол, соболь, тигр, глухарь", correctAnswer: "тайга" }
+    ],
+    "4_nature_hard": [
+        {
+            type: "multi-image",
+            text: "Выберите из 6 фото 4 изображения тех животных, которые относятся к зоне Широколиственные леса",
+            images: ["https://i.postimg.cc/rsx8LKjk/Untitled166_20260309162034.png", "https://i.postimg.cc/1RqRFjQb/Untitled166_20260309162106.png", "https://i.postimg.cc/Hs1Y99WH/Untitled166_20260309162129.png", "https://i.postimg.cc/9FHmYYXm/Untitled166_20260309162208.png", "https://i.postimg.cc/TYvdJJ2K/Untitled166_20260309162224.png", "https://i.postimg.cc/rFG8nRzt/Untitled166_20260309162224.png"],
+            correctIndices: [0, 1, 3, 4]
+        },
+        {
+            type: "multi-image",
+            text: "Выберите из 6 фото 3 изображения тех растений, которые относятся к зоне Тундра",
+            images: ["https://i.postimg.cc/hP4xcd6V/Untitled167_20260309164055.png", "https://i.postimg.cc/J47JMkvq/Untitled167_20260309164112.png", "https://i.postimg.cc/FsFcNL8b/Untitled167_20260309164128.png", "https://i.postimg.cc/m2ZMBHJN/Untitled167_20260309164142.png", "https://i.postimg.cc/MKZRqQNY/Untitled167_20260309164155.png", "https://i.postimg.cc/656Rtvgb/Untitled167_20260309164206.png"],
+            correctIndices: [0, 3, 4]
+        },
+        {
+            type: "multi-image",
+            text: "Выберите из 6 фото 3 изображения тех действий, которые относятся к деятельности человека в зоне Арктических пустынь",
+            images: ["https://i.postimg.cc/v85Fb1f3/Untitled168_20260309165031.png", "https://i.postimg.cc/L6RdXH3D/Untitled168_20260309165046.png", "https://i.postimg.cc/9FV3MWYB/Untitled168_20260309165103.png", "https://i.postimg.cc/rFc6m8NN/Untitled168_20260309165116.png", "https://i.postimg.cc/dtvM1qjB/Untitled168_20260309165131.png", "https://i.postimg.cc/ncZ8zHGT/Untitled168_20260309165139.png"],
+            correctIndices: [0, 1, 3]
+        }
+    ],
+    "5_biology_easy": [
+        { type: "choice", text: "Выбери правильную цепочку органов движения у животных:", options: ["Ноги, крылья, плавники", "Клюв, крылья, голова", "Ноги, хвост, крылья"], correctAnswer: "Ноги, крылья, плавники" },
+        { type: "choice", text: "Что изучает ботаника:", options: ["Животных", "Грибы", "Строение организмов", "Растения"], correctAnswer: "Растения" },
+        { type: "choice", text: "Какой инструмент для измерения: является самым простым:", options: ["Термометр", "Часы", "Линейка", "Весы"], correctAnswer: "Линейка" }
+    ],
+    "5_biology_medium": [
+        { type: "choice", text: "Выбери правильное определение классификации:", options: ["Распределение объектов по группам на основании имеющихся у них общих признаков", "Сопоставление признаков двух или нескольких объектов с целью найти в них общее", "Исследования родственных связей между живыми организмами", "Разделение на группы на основании родства"], correctAnswer: "Распределение объектов по группам на основании имеющихся у них общих признаков" },
+        { type: "choice", text: "Сколько видов ткани есть в организме растений:", options: ["3", "8", "5", "4"], correctAnswer: "5" },
+        { type: "choice", text: "Какая группа живых организмов преобладает на планете:", options: ["Грибы", "Жуки", "Цветковые растения", "Двукрылые"], correctAnswer: "Цветковые растения" }
+    ],
+    "5_biology_hard": [
+        { type: "single-image", text: "Кто из изображенных на портретах является отцом ботаники?", images: ["https://i.postimg.cc/3wcs5FDV/Untitled169_20260310000802.png", "https://i.postimg.cc/5t0hRRjk/yla55k38dklu_teofrast.webp", "https://i.postimg.cc/vmNJFt6J/Untitled169_20260310000816.png", "https://i.postimg.cc/YSs5KzWc/Untitled169_20260310000830.png"], correctAnswer: "https://i.postimg.cc/5t0hRRjk/yla55k38dklu_teofrast.webp" },
+        { type: "single-image", text: "Кто из философов предложил картину мира в которой Земля имеет форму шара и находится в центре Вселенной:", images: ["https://i.postimg.cc/3wcs5FDV/Untitled169_20260310000802.png", "https://i.postimg.cc/5t0hRRjk/yla55k38dklu_teofrast.webp", "https://i.postimg.cc/vmNJFt6J/Untitled169_20260310000816.png", "https://i.postimg.cc/YSs5KzWc/Untitled169_20260310000830.png"], correctAnswer: "https://i.postimg.cc/vmNJFt6J/Untitled169_20260310000816.png" },
+        { type: "single-image", text: "Какое растение из изображенных на картинках не является лекарственным:", images: ["https://i.postimg.cc/2j24z952/Untitled170_20260310001445.png", "https://i.postimg.cc/gkj3rywV/Untitled170_20260310001514.png", "https://i.postimg.cc/J06JP0F9/66b9bd183bb8c313512532.jpg", "https://i.postimg.cc/dt3GDR7r/Untitled170_20260310001602.png"], correctAnswer: "https://i.postimg.cc/J06JP0F9/66b9bd183bb8c313512532.jpg" }
+    ],
+    "7_physics_easy": [
+        { type: "choice", text: "Термин физика означает:", options: ["Наука, изучающая природу и происходящие в ней изменения", "Наука, изучающая состав, строение и свойства веществ", "Наука о природе, изучающая строение, функции и происхождение живых существ", "Наука, изучающая явления и закономерности природы"], correctAnswer: "Наука, изучающая природу и происходящие в ней изменения" },
+        { type: "multi-choice", text: "Какие из перечисленных ниже явлений можно отнести к физическим:", options: ["Механические", "Световые", "Холодные", "Природные"], correctOptions: ["Механические", "Световые"] },
+        { type: "choice", text: "Найди вещество из перечисленного ниже:", options: ["Ложка", "Вода", "Капля воды", "Стакан"], correctAnswer: "Вода" }
+    ],
+    "7_physics_medium": [
+        { type: "matching", text: "Распредели по порядку последовательность действий в цикле научного познания:", items: ["Наблюдение", "Гипотеза", "Теория", "Опыт 1", "Опыт 2", "Опыт 3"], correctAnswers: ["1", "3", "5", "2", "4", "6"] },
+        { type: "choice", text: "Определите, что является языком физики:", options: ["Физические законы", "Физические термины", "Физические теории"], correctAnswer: "Физические термины" },
+        { type: "multi-choice", text: "Что из перечисленного ниже не является веществом:", options: ["Стол", "Свет", "Алюминий", "Вода"], correctOptions: ["Стол", "Свет"] }
+    ],
+    "7_physics_hard": [
+        { type: "single-image", text: "Кто из ученых, изображенных ниже открыл теорию тяготения:", images: ["https://i.postimg.cc/pr5XM1Mn/Untitled171_20260312233855.png", "https://i.postimg.cc/zvHXYPYg/Untitled171_20260312233833.png", "https://i.postimg.cc/brSNfFfS/Untitled171_20260312233910.png", "https://i.postimg.cc/BbPQfwf8/IMG_20260312_233808_024.jpg"], correctAnswer: "https://i.postimg.cc/pr5XM1Mn/Untitled171_20260312233855.png" },
+        { type: "single-image", text: "Кто из ученых, изображенных ниже создал физику, как единую научную систему:", images: ["https://i.postimg.cc/Vv0LPHPr/Untitled171_20260312233926.png", "https://i.postimg.cc/brSNfFfS/Untitled171_20260312233910.png", "https://i.postimg.cc/pr5XM1Mn/Untitled171_20260312233855.png", "https://i.postimg.cc/BbPQfwf8/IMG_20260312_233808_024.jpg"], correctAnswer: "https://i.postimg.cc/brSNfFfS/Untitled171_20260312233910.png" },
+        { type: "single-image", text: "Кто считается основателем экспериментальной физики:", images: ["https://i.postimg.cc/Vv0LPHPr/Untitled171_20260312233926.png", "https://i.postimg.cc/BbPQfwf8/IMG_20260312_233808_024.jpg", "https://i.postimg.cc/pr5XM1Mn/Untitled171_20260312233855.png", "https://i.postimg.cc/brSNfFfS/Untitled171_20260312233910.png"], correctAnswer: "https://i.postimg.cc/BbPQfwf8/IMG_20260312_233808_024.jpg" }
+    ],
+    "8_history_easy": [
+        { type: "choice", text: "В каком году родился Пётр I:", options: ["1832", "1672", "1734", "1795"], correctAnswer: "1672" },
+        { type: "choice", text: "В каком году был издан Манифест о вольности дворянства:", options: ["1762", "1777", "1811", "1793"], correctAnswer: "1762" },
+        { type: "choice", text: "В каком году произошла Полтавская битва:", options: ["1728", "1698", "1709", "1801"], correctAnswer: "1709" }
+    ],
+    "8_history_medium": [
+        { type: "choice", text: "Назови имя гетмана Правобережья, который в 1669 году принял турецкое подданство:", options: ["Михаил Карибут", "Петр Дорошенко", "Франц Лефорт", "Алексей Михайлов"], correctAnswer: "Петр Дорошенко" },
+        { type: "choice", text: "Где произошла битва между русскими войсками и шведами, победа в которой помешала шведам нанести удар по Москве в 1708 году:", options: ["У мыса Гангут", "Под Нарвой", "При Лесной", "У мыса Гренгам"], correctAnswer: "При Лесной" },
+        { type: "choice", text: "Главная цель «Великого посольства»:", options: ["Завоевание крепости Азов", "Получение выхода России в Черное море", "Получение права беспошлинной торговли", "Заручиться поддержкой европейских стран"], correctAnswer: "Заручиться поддержкой европейских стран" }
+    ],
+    "8_history_hard": [
+        { type: "choice", image: "https://i.postimg.cc/DyQzyr86/Surikov-Menshikov-Berezovo.jpg", text: "Какие события связаны с исторической личностью, изображенной на картине:", options: ["Роспуск Верховного тайного Совета", "Полтавское сражение", "Отмена внутренних таможенных пошлин", "Подавление Соловецкого восстания"], correctAnswer: "Роспуск Верховного тайного Совета" },
+        { type: "choice", image: "https://i.postimg.cc/Ssb5sMXD/1280px-Vienna-Battle-1683.jpg", text: "Ниже изображено событие, которое завершилось победой Союзных сил (Священной Римской империей и Речи Посполитой). Определите это событие и дату, когда это произошло:", options: ["Прутский поход в 1710 году", "Осада крепости Азов в 1637 году", "Венская битва в 1683 году", "Полтавская битва в 1709 году"], correctAnswer: "Венская битва в 1683 году" },
+        { type: "choice", image: "https://i.postimg.cc/50jHX6ZL/960px-Copy-Charles-XII-Nationalmuseum.jpg", text: "Выберите имя короля, представленного на иллюстрации:", options: ["Карл XII", "Михаил Карибут", "Фридрих II", "Людовик XV"], correctAnswer: "Карл XII" }
+    ]
+};
