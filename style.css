@@ -48,14 +48,27 @@ body {
     transition: opacity 0.5s ease;
 }
 
-#demo-modal {
+/* Стили для нового кастомного модального окна */
+#modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4); 
+    z-index: 10000;
+    cursor: pointer;
+}
+
+#custom-modal {
     display: none; 
     position: fixed; 
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%); 
-    background-color: gray; 
-    color: lightgray; 
+    background-color: #333; 
+    color: white; 
     padding: 30px 20px; 
     z-index: 10001; 
     text-align: center; 
@@ -63,15 +76,8 @@ body {
     max-width: 300px;
     font-size: 18px;
     font-weight: bold;
-}
-
-.close-modal {
-    position: absolute; 
-    top: 5px; 
-    right: 15px; 
-    color: red; 
-    font-size: 28px; 
-    font-weight: bold; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     cursor: pointer;
 }
 
@@ -525,3 +531,4 @@ body {
     object-fit: cover; 
     border: 2px solid #fff; 
 }
+
