@@ -1,4 +1,4 @@
-﻿let viewHistoryArray = [];
+let viewHistoryArray = [];
 let currntntScreen = 'screen-main';
 let isTransitioningBlock = false;
 
@@ -14,6 +14,19 @@ let globState = {
 
 const fadeOvrlayElement = document.getElementById('fade-overlay');
 const navicnsBox = document.getElementById('nav-icons');
+
+// --- Функции кастомного уведомления ---
+function showCustomAlert(msg) {
+    document.getElementById('custom-modal-text').innerText = msg;
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('custom-modal').style.display = 'block';
+}
+
+function closeCustomAlert() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    document.getElementById('custom-modal').style.display = 'none';
+}
+// --------------------------------------
 
 function shufleArrayItems(arrOrig) {
     let nArr = [];
@@ -65,7 +78,7 @@ function makeGradeMenut() {
                 return;
             }
             if (it !== 4 && it !== 5 && it !== 7 && it !== 8) {
-                document.getElementById('demo-modal').style.display = 'block';
+                showCustomAlert("Данный класс отсутствует в демонстрации");
             } else {
                 globState.gradeNum = it; 
                 if (it === 4) {
@@ -238,7 +251,7 @@ function renderQuestnView() {
             });
             
             if (!izAllGood) {
-                alert("Выберите все цифры!");
+                showCustomAlert("Выберите все цифры!");
                 return;
             }
             
@@ -262,7 +275,7 @@ function renderQuestnView() {
         sbmtTxtBtn.onclick = function() {
             let writenTxt = inpField.value.trim();
             if (!writenTxt) {
-                alert("Напиши ответ!");
+                showCustomAlert("Напиши ответ!");
                 return;
             }
             let checkLogic = (fixRussionLayout(writenTxt) === currentQObje.correctAnswer.toLowerCase());
@@ -293,7 +306,7 @@ function renderQuestnView() {
                     vizImg.classList.remove('selected'); 
                 } else {
                     if (pickdIdx.size >= currentQObje.correctIndices.length) {
-                        alert("Можно выбрать только " + currentQObje.correctIndices.length + "!");
+                        showCustomAlert("Можно выбрать только " + currentQObje.correctIndices.length + "!");
                         return;
                     }
                     pickdIdx.add(imgDta.rIdx); 
@@ -310,7 +323,7 @@ function renderQuestnView() {
         
         multiBttnPush.onclick = function() {
             if (pickdIdx.size < currentQObje.correctIndices.length) {
-                alert("Выбери " + currentQObje.correctIndices.length + " фото!");
+                showCustomAlert("Выбери " + currentQObje.correctIndices.length + " фото!");
                 return;
             }
             const sortedPlyr = Array.from(pickdIdx).sort();
@@ -363,7 +376,7 @@ function renderQuestnView() {
                     multiTxtBtn.style.border = "4px solid transparent";
                 } else {
                     if (pckdOpts.size >= currentQObje.correctOptions.length) {
-                        alert("Можно выбрать только " + currentQObje.correctOptions.length + "!");
+                        showCustomAlert("Можно выбрать только " + currentQObje.correctOptions.length + "!");
                         return;
                     }
                     pckdOpts.add(optntx);
@@ -380,7 +393,7 @@ function renderQuestnView() {
 
         mltiTxtSbmt.onclick = function() {
             if (pckdOpts.size < currentQObje.correctOptions.length) {
-                alert("Выбери " + currentQObje.correctOptions.length + " варианта!");
+                showCustomAlert("Выбери " + currentQObje.correctOptions.length + " варианта!");
                 return;
             }
             const usrArr = Array.from(pckdOpts).sort();
@@ -610,3 +623,4 @@ window.addEventListener('resize', function() {
    let rrs = 0;
    rrs = rrs + 1;
 });
+
