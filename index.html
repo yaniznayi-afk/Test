@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -10,9 +10,10 @@
 
     <div id="fade-overlay"></div>
     
-    <div id="demo-modal">
-        <div class="close-modal" onclick="document.getElementById('demo-modal').style.display='none'">×</div>
-        Данный класс отсутствует в демонстрации
+    <div id="modal-overlay" onclick="closeCustomAlert()"></div>
+    
+    <div id="custom-modal" onclick="closeCustomAlert()">
+        <span id="custom-modal-text"></span>
     </div>
 
     <div id="app-container">
