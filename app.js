@@ -1,626 +1,314 @@
-let viewHistoryArray = [];
-let currntntScreen = 'screen-main';
-let isTransitioningBlock = false;
+let viewHistoryArray=[];let currentScreen='screen-main';let isTransitioning=false;
+let globalState={gradeNumber:null,subjectString:null,difficultyLevel:null,currentQuestionList:[],currentQuestionIndex:0,mistakesCount:0,userLog:[]};
+const fadeOverlayElement=document.getElementById('fade-overlay');const navigationIconsBox=document.getElementById('navigation-icons');
 
-let globState = { 
-    gradeNum: null, 
-    subjectStr: null, 
-    diffLvl: null, 
-    curentQList: [], 
-    curntntIdex: 0, 
-    misstakes: 0, 
-    userLog: [] 
-};
+function showCustomAlert(message){document.getElementById('custom-modal-text').innerText=message;document.getElementById('modal-overlay').style.display='block';document.getElementById('custom-modal').style.display='block';}
+function closeCustomAlert(){document.getElementById('modal-overlay').style.display='none';document.getElementById('custom-modal').style.display='none';}
 
-const fadeOvrlayElement = document.getElementById('fade-overlay');
-const navicnsBox = document.getElementById('nav-icons');
-
-// --- Функции кастомного уведомления ---
-function showCustomAlert(msg) {
-    document.getElementById('custom-modal-text').innerText = msg;
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('custom-modal').style.display = 'block';
-}
-
-function closeCustomAlert() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('custom-modal').style.display = 'none';
-}
-// --------------------------------------
-
-function shufleArrayItems(arrOrig) {
-    let nArr = [];
-    for (let e = 0; e < arrOrig.length; e++) {
-        nArr.push(arrOrig[e]);
+function shuffleArrayItems(originalArray) {
+    let newArray = new Array();
+      for (let index = 0; index < originalArray.length; index++) { newArray.push(originalArray[index]); }
+    let reverseIndex = newArray.length - 1;
+       while (reverseIndex > 0) {
+        let randomValString = Math.random().toString();
+        let calculatedNum = parseFloat(randomValString) * (reverseIndex + 1);
+          const randomIndex = Math.floor(calculatedNum);
+        let temporaryValue = newArray[reverseIndex];
+        newArray[reverseIndex] = newArray[randomIndex];
+            newArray[randomIndex] = temporaryValue;
+        reverseIndex = reverseIndex - 1;
     }
-    
-    for (let f = nArr.length - 1; f > 0; f--) {
-        const jndex = Math.floor(Math.random() * (f + 1));
-        let tmpVal = nArr[f];
-        nArr[f] = nArr[jndex];
-        nArr[jndex] = tmpVal;
-    }
-    return nArr;
+    return newArray;
 }
 
-function fixRussionLayout(inputStr) {
-    const replcrDict = { 'q':'й', 'w':'ц', 'e':'у', 'r':'к', 't':'е', 'y':'н', 'u':'г', 'i':'ш', 'o':'щ', 'p':'з', '[':'х', ']':'ъ', 'a':'ф', 's':'ы', 'd':'в', 'f':'а', 'g':'п', 'h':'р', 'j':'о', 'k':'л', 'l':'д', ';':'ж', "'":'э', 'z':'я', 'x':'ч', 'c':'с', 'v':'м', 'b':'и', 'n':'т', 'm':'ь', ',':'б', '.':'ю' };
-    let resultngString = "";
-    let lowcaseStr = inputStr.toLowerCase();
-    
-    for (let h = 0; h < lowcaseStr.length; h++) {
-        let snglChar = lowcaseStr[h];
-        if (replcrDict[snglChar]) {
-            resultngString += replcrDict[snglChar];
-        } else {
-            resultngString += snglChar;
-        }
+function fixRussianKeyboardLayout(inputString) {
+    let resultingString = ""; let lowercaseString = inputString.toLowerCase(); let replacerDictionary = { 'q':'й', 'w':'ц', 'e':'у', 'r':'к', 't':'е', 'y':'н', 'u':'г', 'i':'ш', 'o':'щ', 'p':'з', '[':'х', ']':'ъ', 'a':'ф', 's':'ы', 'd':'в', 'f':'а', 'g':'п', 'h':'р', 'j':'о', 'k':'л', 'l':'д', ';':'ж', "'":'э', 'z':'я', 'x':'ч', 'c':'с', 'v':'м', 'b':'и', 'n':'т', 'm':'ь', ',':'б', '.':'ю' };
+    let charIndex = 0;
+    while(charIndex < lowercaseString.length) {
+         let singleCharacter = lowercaseString.charAt(charIndex);
+        if (replacerDictionary[singleCharacter] !== undefined && replacerDictionary[singleCharacter] !== null) { resultingString = resultingString + replacerDictionary[singleCharacter]; } else { resultingString = resultingString + singleCharacter; }
+        charIndex++;
     }
-    return resultngString.trim();
+    return resultingString.trim();
 }
 
-function makeGradeMenut() {
-    const wrappr = document.getElementById('grades-container');
-    for (let it = 1; it <= 9; it++) {
-        const grCirc = document.createElement('div');
+function createGradeMenu() {
+    let gradesContainer = document.getElementById('grades-container');
+    let gradeIterator = 1;
+    while(gradeIterator <= 9) {
+        const gradeCircle = document.createElement('div');
+        let tempClassName = "grade-circle ";
+        if (gradeIterator === 4 || gradeIterator === 5 || gradeIterator === 7 || gradeIterator === 8) { tempClassName = tempClassName + "background-red"; } else { tempClassName = tempClassName + "background-gray"; }
+        gradeCircle.className = tempClassName; gradeCircle.innerText = gradeIterator.toString();
         
-        grCirc.className = "grade-circle ";
-        if (it === 4 || it === 5 || it === 7 || it === 8) {
-            grCirc.className += "bg-red";
-        } else {
-            grCirc.className += "bg-gray";
-        }
-
-        grCirc.innerText = it;
-        
-        grCirc.onclick = function() {
-            if (isTransitioningBlock) {
-                return;
-            }
-            if (it !== 4 && it !== 5 && it !== 7 && it !== 8) {
-                showCustomAlert("Данный класс отсутствует в демонстрации");
-            } else {
-                globState.gradeNum = it; 
-                if (it === 4) {
-                    globState.subjectStr = 'Окружающий Мир';
-                } else if (it === 5) {
-                    globState.subjectStr = 'Биология';
-                } else if (it === 7) {
-                    globState.subjectStr = 'Физика';
-                } else if (it === 8) {
-                    globState.subjectStr = 'История';
+        gradeCircle.onclick = (function(innerGrade) {
+            return function() {
+                if (isTransitioning === true) { return; }
+                if (innerGrade !== 4 && innerGrade !== 5 && innerGrade !== 7 && innerGrade !== 8) { showCustomAlert("Данный класс отсутствует в демонстрации"); } else {
+                    globalState.gradeNumber = innerGrade;
+                    switch(innerGrade) { case 4: globalState.subjectString = 'Окружающий Мир'; break; case 5: globalState.subjectString = 'Биология'; break; case 7: globalState.subjectString = 'Физика'; break; case 8: globalState.subjectString = 'История'; break; }
+                    prepareSubjectScreen(); changeScreenVisibility('screen-subjects');
                 }
-                
-                prepareSbjtScreen(); 
-                changeScreenVis('screen-subjects');
             }
-        };
-        wrappr.appendChild(grCirc);
+        })(gradeIterator);
+        gradesContainer.appendChild(gradeCircle); gradeIterator++;
     }
 }
-makeGradeMenut();
+createGradeMenu();
 
-function prepareSbjtScreen() {
-    const cntnr = document.getElementById('subjects-container');
-    cntnr.innerHTML = '<button class="btn-sharp btn-subject" onclick="changeScreenVis(\'screen-mode\')">' + globState.subjectStr + '</button>';
-    
-    const txtTheoryBox = document.getElementById('theory-title');
-    txtTheoryBox.innerText = "Теория для " + globState.gradeNum + " класса: " + globState.subjectStr;
+function prepareSubjectScreen() {
+    document.getElementById('subjects-container').innerHTML = '<button class="button-sharp button-subject" onclick="changeScreenVisibility(\'screen-mode\')">' + globalState.subjectString + '</button>';
+    document.getElementById('theory-title').innerText = "Теория для " + globalState.gradeNumber + " класса: " + globalState.subjectString;
 }
 
-function strtGameProcess() { 
-    changeScreenVis('screen-grades'); 
+function startGameProcess(){changeScreenVisibility('screen-grades');}
+
+function beginPracticeLevel(difficultyLevelCode) {
+    let subjectEnglishWord = "";
+    if (globalState.subjectString === "История") { subjectEnglishWord = "History"; } else { if (globalState.subjectString === "Биология") { subjectEnglishWord = "Biology"; } else { if (globalState.subjectString === "Физика") { subjectEnglishWord = "Physics"; } else { subjectEnglishWord = "Nature"; } } }
+    let comboKey = ["grade", globalState.gradeNumber, subjectEnglishWord, difficultyLevelCode].join('');
+    
+    globalState.difficultyLevel = difficultyLevelCode; globalState.mistakesCount = 0; globalState.userLog = new Array(); globalState.currentQuestionIndex = 0; 
+    let baseDataRef = questionsBaseData[comboKey]; globalState.currentQuestionList = shuffleArrayItems(baseDataRef);
+    renderQuestionView(); changeScreenVisibility('screen-practice');
 }
 
-function beginPrcticeLevel(difLvlCode) {
-    let sbjEngWord = "nature";
-    if (globState.subjectStr === "История") {
-        sbjEngWord = "history";
-    } else if (globState.subjectStr === "Биология") {
-        sbjEngWord = "biology";
-    } else if (globState.subjectStr === "Физика") {
-        sbjEngWord = "physics";
-    }
-    
-    const comboKy = globState.gradeNum + "_" + sbjEngWord + "_" + difLvlCode;
-    
-    globState.diffLvl = difLvlCode; 
-    globState.misstakes = 0; 
-    globState.userLog = [];
-    globState.curntntIdex = 0; 
-    globState.curentQList = shufleArrayItems(questionsBaseData[comboKy]);
-    
-    renderQuestnView(); 
-    changeScreenVis('screen-practice');
-}
+function renderQuestionView() {
+    const practiceArea = document.getElementById('screen-practice'); practiceArea.innerHTML = '';
+    let currentQuestionObject = globalState.currentQuestionList[globalState.currentQuestionIndex];
+    let numberDivision = document.createElement('div'); numberDivision.className = 'task-counter'; numberDivision.innerText = "Задание " + (globalState.currentQuestionIndex + 1) + "/" + globalState.currentQuestionList.length; practiceArea.appendChild(numberDivision);
 
-function renderQuestnView() {
-    const practArea = document.getElementById('screen-practice');
-    practArea.innerHTML = ''; 
-    
-    const currentQObje = globState.curentQList[globState.curntntIdex];
-    
-    const nmbrDiv = document.createElement('div');
-    nmbrDiv.className = 'task-counter';
-    nmbrDiv.innerText = "Задание " + (globState.curntntIdex + 1) + "/" + globState.curentQList.length;
-    practArea.appendChild(nmbrDiv);
+    if (currentQuestionObject.image !== undefined) { const imageTag = document.createElement('img'); imageTag.src = currentQuestionObject.image; imageTag.className = 'question-image'; practiceArea.appendChild(imageTag); }
+    const mainText = document.createElement('div'); mainText.className = 'question-text'; mainText.innerText = currentQuestionObject.text; practiceArea.appendChild(mainText);
 
-    if (currentQObje.image) {
-        const imgTagg = document.createElement('img');
-        imgTagg.src = currentQObje.image; 
-        imgTagg.className = 'question-img';
-        practArea.appendChild(imgTagg);
-    }
-
-    const mainTexto = document.createElement('div');
-    mainTexto.className = 'question-text'; 
-    mainTexto.innerText = currentQObje.text;
-    practArea.appendChild(mainTexto);
-
-    if (currentQObje.type === 'choice') {
-        const griddy = document.createElement('div'); 
-        griddy.className = 'grid-2x2';
-        
-        let choisesArr = shufleArrayItems(currentQObje.options);
-        choisesArr.forEach(function(optntxt, inndx) {
-            const ansBtn = document.createElement('button'); 
-            ansBtn.className = 'btn-answer';
-            
-            if (choisesArr.length % 2 !== 0 && inndx === choisesArr.length - 1) {
-                ansBtn.classList.add('odd-centered');
-            }
-            
-            ansBtn.innerText = optntxt;
-            ansBtn.onclick = function() {
-                let itisRight = (optntxt === currentQObje.correctAnswer);
-                registerPlyrAnswer(itisRight, optntxt, currentQObje.correctAnswer, ansBtn);
+    if (currentQuestionObject.type === 'choice') {
+        const gridContainer = document.createElement('div'); gridContainer.className = 'grid-two-by-two';
+        let choicesArray = shuffleArrayItems(currentQuestionObject.options);
+        for(let optionIndex = 0; optionIndex < choicesArray.length; optionIndex++) {
+            let optionText = choicesArray[optionIndex];
+            const answerButton = document.createElement('button'); answerButton.className = 'button-answer';
+            if (choicesArray.length % 2 !== 0) { if (optionIndex === choicesArray.length - 1) { answerButton.classList.add('odd-centered'); } }
+            answerButton.innerText = optionText;
+            answerButton.onclick = function() {
+                let checkStr1 = optionText.toString(); let checkStr2 = currentQuestionObject.correctAnswer.toString();
+                let isCorrect = false; if (checkStr1 === checkStr2) { isCorrect = true; }
+                registerPlayerAnswer(isCorrect, optionText, currentQuestionObject.correctAnswer, answerButton);
             };
-            griddy.appendChild(ansBtn);
-        });
-        practArea.appendChild(griddy);
-
-    } else if (currentQObje.type === 'matching') {
-        const mWrap = document.createElement('div'); 
-        mWrap.className = 'matching-container';
-        const listOfSelects = [];
+            gridContainer.appendChild(answerButton);
+        }
+        practiceArea.appendChild(gridContainer);
+    } else if (currentQuestionObject.type === 'matching') {
+        const matchingWrapper = document.createElement('div'); matchingWrapper.className = 'matching-container'; const listOfSelectElements = [];
+        for(let z=0; z<currentQuestionObject.items.length; z++) {
+            let itemLabel = currentQuestionObject.items[z];
+            const rowLine = document.createElement('div'); rowLine.className = 'matching-row';
+            const dropdownMenu = document.createElement('select'); dropdownMenu.className = 'matching-select'; dropdownMenu.innerHTML = '<option value="">-</option>';
+            let dropdownIndex = 1; while(dropdownIndex <= currentQuestionObject.items.length) { dropdownMenu.innerHTML += '<option value="' + dropdownIndex + '">' + dropdownIndex + '</option>'; dropdownIndex++; }
+            listOfSelectElements.push(dropdownMenu); rowLine.appendChild(dropdownMenu);
+            const itemSpan = document.createElement('span'); itemSpan.innerText = itemLabel; rowLine.appendChild(itemSpan); matchingWrapper.appendChild(rowLine);
+        }
+        practiceArea.appendChild(matchingWrapper);
         
-        currentQObje.items.forEach(function(itm) {
-            const rowLine = document.createElement('div'); 
-            rowLine.className = 'matching-row';
-            
-            const ddMenu = document.createElement('select'); 
-            ddMenu.className = 'matching-select';
-            ddMenu.innerHTML = '<option value="">-</option>'; 
-            
-            for (let vv = 1; vv <= currentQObje.items.length; vv++) {
-                ddMenu.innerHTML += '<option value="' + vv + '">' + vv + '</option>';
-            }
-            
-            listOfSelects.push(ddMenu); 
-            rowLine.appendChild(ddMenu); 
-            
-            const itmLbl = document.createElement('span'); 
-            itmLbl.innerText = itm; 
-            rowLine.appendChild(itmLbl); 
-            mWrap.appendChild(rowLine);
-        });
-        practArea.appendChild(mWrap);
-        
-        function updatteSelectsVals() {
-            const choosenVlsLst = [];
-            for (let k = 0; k < listOfSelects.length; k++) {
-                if (listOfSelects[k].value !== "" && listOfSelects[k].value !== "-") {
-                    choosenVlsLst.push(listOfSelects[k].value);
-                }
-            }
-            
-            for (let m = 0; m < listOfSelects.length; m++) {
-                let curSel = listOfSelects[m];
-                let valNow = curSel.value;
-                
-                for (let p = 0; p < curSel.options.length; p++) {
-                    let currOpt = curSel.options[p];
-                    
-                    if (currOpt.value === "" || currOpt.value === "-") {
-                        currOpt.disabled = false;
-                        continue;
-                    }
-                    
-                    if (choosenVlsLst.includes(currOpt.value) && currOpt.value !== valNow) {
-                        currOpt.disabled = true;
-                    } else {
-                        currOpt.disabled = false;
-                    }
+        function updateSelectValues() {
+            let chosenValuesList = [];
+            for (let index = 0; index < listOfSelectElements.length; index++) { if (listOfSelectElements[index].value !== "" && listOfSelectElements[index].value !== "-") { chosenValuesList.push(listOfSelectElements[index].value); } }
+            for (let index = 0; index < listOfSelectElements.length; index++) {
+                let currentSelect = listOfSelectElements[index]; let valueNow = currentSelect.value;
+                for (let optionIndex = 0; optionIndex < currentSelect.options.length; optionIndex++) {
+                    let currentOption = currentSelect.options[optionIndex];
+                    if (currentOption.value === "" || currentOption.value === "-") { currentOption.disabled = false; continue; }
+                    if (chosenValuesList.indexOf(currentOption.value) !== -1 && currentOption.value !== valueNow) { currentOption.disabled = true; } else { currentOption.disabled = false; }
                 }
             }
         }
         
-        listOfSelects.forEach(function(selll) {
-            selll.addEventListener('change', updatteSelectsVals);
-        });
+        for(let selIdx=0; selIdx<listOfSelectElements.length; selIdx++) { listOfSelectElements[selIdx].addEventListener('change', updateSelectValues); }
         
-        const pushBtn = document.createElement('button'); 
-        pushBtn.className = 'btn-confirm'; 
-        pushBtn.innerText = 'ПОДТВЕРДИТЬ';
-        pushBtn.onclick = function() {
-            let izAllGood = true;
-            listOfSelects.forEach(function(ss) {
-                if (ss.value === "") {
-                    izAllGood = false;
-                }
-            });
-            
-            if (!izAllGood) {
-                showCustomAlert("Выберите все цифры!");
-                return;
-            }
-            
-            const plrData = listOfSelects.map(function(smap) { return smap.value; });
-            let rightOrno = (JSON.stringify(plrData) === JSON.stringify(currentQObje.correctAnswers));
-            
-            registerPlyrAnswer(rightOrno, plrData.join(', '), currentQObje.correctAnswers.join(', '), pushBtn);
+        const pushButton = document.createElement('button'); pushButton.className = 'button-confirm'; pushButton.innerText = 'ПОДТВЕРДИТЬ';
+        pushButton.onclick = function() {
+            let isAllGood = true; for(let k=0; k<listOfSelectElements.length; k++) { if (listOfSelectElements[k].value === "") { isAllGood = false; } }
+            if (isAllGood === false) { showCustomAlert("Выберите все цифры!"); return; }
+            let playerData = []; for(let v=0; v<listOfSelectElements.length; v++) { playerData.push(listOfSelectElements[v].value); }
+            let str1 = JSON.stringify(playerData); let str2 = JSON.stringify(currentQuestionObject.correctAnswers);
+            let isRight = false; if (str1 === str2) { isRight = true; }
+            registerPlayerAnswer(isRight, playerData.join(', '), currentQuestionObject.correctAnswers.join(', '), pushButton);
         };
-        practArea.appendChild(pushBtn);
-
-    } else if (currentQObje.type === 'text') {
-        const inpField = document.createElement('input'); 
-        inpField.className = 'text-input'; 
-        inpField.placeholder = 'Ответ...';
-        practArea.appendChild(inpField);
-        
-        const sbmtTxtBtn = document.createElement('button'); 
-        sbmtTxtBtn.className = 'btn-confirm'; 
-        sbmtTxtBtn.innerText = 'ПОДТВЕРДИТЬ';
-        
-        sbmtTxtBtn.onclick = function() {
-            let writenTxt = inpField.value.trim();
-            if (!writenTxt) {
-                showCustomAlert("Напиши ответ!");
-                return;
-            }
-            let checkLogic = (fixRussionLayout(writenTxt) === currentQObje.correctAnswer.toLowerCase());
-            registerPlyrAnswer(checkLogic, writenTxt, currentQObje.correctAnswer, sbmtTxtBtn);
+        practiceArea.appendChild(pushButton);
+    } else if (currentQuestionObject.type === 'text') {
+        const inputField = document.createElement('input'); inputField.className = 'text-input'; inputField.placeholder = 'Ответ...'; practiceArea.appendChild(inputField);
+        const submitTextButton = document.createElement('button'); submitTextButton.className = 'button-confirm'; submitTextButton.innerText = 'ПОДТВЕРДИТЬ';
+        submitTextButton.onclick = function() {
+            let writtenText = inputField.value.trim();
+            if (writtenText.length === 0) { showCustomAlert("Напиши ответ!"); return; }
+            let checkLogic = false; if (fixRussianKeyboardLayout(writtenText) === currentQuestionObject.correctAnswer.toLowerCase()) { checkLogic = true; }
+            registerPlayerAnswer(checkLogic, writtenText, currentQuestionObject.correctAnswer, submitTextButton);
         };
-        practArea.appendChild(sbmtTxtBtn);
-
-    } else if (currentQObje.type === 'multi-image') {
-        const mltiArea = document.createElement('div'); 
-        mltiArea.className = 'multi-img-grid';
-        const pickdIdx = new Set();
-        
-        let arrayObj = [];
-        for (let d = 0; d < currentQObje.images.length; d++) {
-            arrayObj.push({ theSrc: currentQObje.images[d], rIdx: d });
-        }
-        
-        let rendmzImages = shufleArrayItems(arrayObj);
-        
-        rendmzImages.forEach(function(imgDta) {
-            const vizImg = document.createElement('img'); 
-            vizImg.src = imgDta.theSrc; 
-            vizImg.className = 'multi-img-item';
-            
-            vizImg.onclick = function() {
-                if (pickdIdx.has(imgDta.rIdx)) { 
-                    pickdIdx.delete(imgDta.rIdx); 
-                    vizImg.classList.remove('selected'); 
-                } else {
-                    if (pickdIdx.size >= currentQObje.correctIndices.length) {
-                        showCustomAlert("Можно выбрать только " + currentQObje.correctIndices.length + "!");
-                        return;
-                    }
-                    pickdIdx.add(imgDta.rIdx); 
-                    vizImg.classList.add('selected');
+        practiceArea.appendChild(submitTextButton);
+    } else if (currentQuestionObject.type === 'multipleImage') {
+        const multipleArea = document.createElement('div'); multipleArea.className = 'multiple-image-grid'; const pickedIndices = new Set();
+        let arrayObjects = []; for (let imageIndex = 0; imageIndex < currentQuestionObject.images.length; imageIndex++) { arrayObjects.push({ imageSource: currentQuestionObject.images[imageIndex], originalIndex: imageIndex }); }
+        let randomizedImages = shuffleArrayItems(arrayObjects);
+        for(let imgIdx=0; imgIdx<randomizedImages.length; imgIdx++) {
+            let imageData = randomizedImages[imgIdx]; const visualImage = document.createElement('img'); visualImage.src = imageData.imageSource; visualImage.className = 'multiple-image-item';
+            visualImage.onclick = function() {
+                if (pickedIndices.has(imageData.originalIndex) === true) { pickedIndices.delete(imageData.originalIndex); visualImage.classList.remove('selected'); } else {
+                    if (pickedIndices.size >= currentQuestionObject.correctIndices.length) { showCustomAlert("Можно выбрать только " + currentQuestionObject.correctIndices.length + "!"); return; }
+                    pickedIndices.add(imageData.originalIndex); visualImage.classList.add('selected');
                 }
             };
-            mltiArea.appendChild(vizImg);
-        });
-        practArea.appendChild(mltiArea);
-        
-        const multiBttnPush = document.createElement('button'); 
-        multiBttnPush.className = 'btn-confirm'; 
-        multiBttnPush.innerText = 'ПОДТВЕРДИТЬ';
-        
-        multiBttnPush.onclick = function() {
-            if (pickdIdx.size < currentQObje.correctIndices.length) {
-                showCustomAlert("Выбери " + currentQObje.correctIndices.length + " фото!");
-                return;
-            }
-            const sortedPlyr = Array.from(pickdIdx).sort();
-            const srtedTru = [...currentQObje.correctIndices].sort();
-            let testng = (JSON.stringify(sortedPlyr) === JSON.stringify(srtedTru));
-            
-            registerPlyrAnswer(testng, sortedPlyr, currentQObje.correctIndices, multiBttnPush);
-        };
-        practArea.appendChild(multiBttnPush);
-        
-    } else if (currentQObje.type === 'single-image') {
-        const singlGrd = document.createElement('div'); 
-        singlGrd.className = 'grid-2x2';
-        
-        let smplArr = [];
-        for (let yx = 0; yx < currentQObje.images.length; yx++) {
-            smplArr.push(currentQObje.images[yx]);
+            multipleArea.appendChild(visualImage);
         }
-        
-        let mixxedSngl = shufleArrayItems(smplArr);
-        
-        mixxedSngl.forEach(function(singlPicUrl) {
-            const actPic = document.createElement('img'); 
-            actPic.src = singlPicUrl; 
-            actPic.className = 'single-img-item';
-            
-            actPic.onclick = function() {
-                let doesMtch = (singlPicUrl === currentQObje.correctAnswer);
-                registerPlyrAnswer(doesMtch, singlPicUrl, currentQObje.correctAnswer, actPic);
+        practiceArea.appendChild(multipleArea);
+        const multipleButtonPush = document.createElement('button'); multipleButtonPush.className = 'button-confirm'; multipleButtonPush.innerText = 'ПОДТВЕРДИТЬ';
+        multipleButtonPush.onclick = function() {
+            if (pickedIndices.size < currentQuestionObject.correctIndices.length) { showCustomAlert("Выбери " + currentQuestionObject.correctIndices.length + " фото!"); return; }
+            let sortedPlayer = Array.from(pickedIndices); sortedPlayer.sort(); let sortedTrue = []; for(let c=0; c<currentQuestionObject.correctIndices.length; c++){sortedTrue.push(currentQuestionObject.correctIndices[c]);} sortedTrue.sort();
+            let isTesting = false; if (JSON.stringify(sortedPlayer) === JSON.stringify(sortedTrue)) { isTesting = true; }
+            registerPlayerAnswer(isTesting, sortedPlayer, currentQuestionObject.correctIndices, multipleButtonPush);
+        };
+        practiceArea.appendChild(multipleButtonPush);
+    } else if (currentQuestionObject.type === 'singleImage') {
+        const singleGrid = document.createElement('div'); singleGrid.className = 'grid-two-by-two'; let sampleArray = [];
+        for (let imageIndex = 0; imageIndex < currentQuestionObject.images.length; imageIndex++) { sampleArray.push(currentQuestionObject.images[imageIndex]); }
+        let mixedSingle = shuffleArrayItems(sampleArray);
+        for(let sIdx=0; sIdx<mixedSingle.length; sIdx++) {
+            let singlePictureUrl = mixedSingle[sIdx]; const actualPicture = document.createElement('img'); actualPicture.src = singlePictureUrl; actualPicture.className = 'single-image-item';
+            actualPicture.onclick = function() {
+                let doesMatch = false; if (singlePictureUrl === currentQuestionObject.correctAnswer) { doesMatch = true; }
+                registerPlayerAnswer(doesMatch, singlePictureUrl, currentQuestionObject.correctAnswer, actualPicture);
             };
-            singlGrd.appendChild(actPic);
-        });
-        practArea.appendChild(singlGrd);
-        
-    } else if (currentQObje.type === 'multi-choice') {
-        const mltiTxtGrd = document.createElement('div');
-        mltiTxtGrd.className = 'grid-2x2';
-        const pckdOpts = new Set();
-
-        let shfldOpts = shufleArrayItems(currentQObje.options);
-
-        shfldOpts.forEach(function(optntx) {
-            const multiTxtBtn = document.createElement('button');
-            multiTxtBtn.className = 'btn-answer';
-            multiTxtBtn.innerText = optntx;
-
-            multiTxtBtn.onclick = function() {
-                if (pckdOpts.has(optntx)) {
-                    pckdOpts.delete(optntx);
-                    multiTxtBtn.style.border = "4px solid transparent";
-                } else {
-                    if (pckdOpts.size >= currentQObje.correctOptions.length) {
-                        showCustomAlert("Можно выбрать только " + currentQObje.correctOptions.length + "!");
-                        return;
-                    }
-                    pckdOpts.add(optntx);
-                    multiTxtBtn.style.border = "4px solid red";
+            singleGrid.appendChild(actualPicture);
+        }
+        practiceArea.appendChild(singleGrid);
+    } else if (currentQuestionObject.type === 'multipleChoice') {
+        const multipleTextGrid = document.createElement('div'); multipleTextGrid.className = 'grid-two-by-two'; const pickedOptions = new Set();
+        let shuffledOptions = shuffleArrayItems(currentQuestionObject.options);
+        for(let oIdx=0; oIdx<shuffledOptions.length; oIdx++) {
+            let optionText = shuffledOptions[oIdx]; const multipleTextButton = document.createElement('button'); multipleTextButton.className = 'button-answer'; multipleTextButton.innerText = optionText;
+            multipleTextButton.onclick = function() {
+                if (pickedOptions.has(optionText) === true) { pickedOptions.delete(optionText); multipleTextButton.style.border = "4px solid transparent"; } else {
+                    if (pickedOptions.size >= currentQuestionObject.correctOptions.length) { showCustomAlert("Можно выбрать только " + currentQuestionObject.correctOptions.length + "!"); return; }
+                    pickedOptions.add(optionText); multipleTextButton.style.border = "4px solid red";
                 }
             };
-            mltiTxtGrd.appendChild(multiTxtBtn);
-        });
-        practArea.appendChild(mltiTxtGrd);
-
-        const mltiTxtSbmt = document.createElement('button');
-        mltiTxtSbmt.className = 'btn-confirm';
-        mltiTxtSbmt.innerText = 'ПОДТВЕРДИТЬ';
-
-        mltiTxtSbmt.onclick = function() {
-            if (pckdOpts.size < currentQObje.correctOptions.length) {
-                showCustomAlert("Выбери " + currentQObje.correctOptions.length + " варианта!");
-                return;
-            }
-            const usrArr = Array.from(pckdOpts).sort();
-            const truuArr = [...currentQObje.correctOptions].sort();
-            let issGudd = (JSON.stringify(usrArr) === JSON.stringify(truuArr));
-
-            registerPlyrAnswer(issGudd, usrArr.join(', '), currentQObje.correctOptions.join(', '), mltiTxtSbmt);
+            multipleTextGrid.appendChild(multipleTextButton);
+        }
+        practiceArea.appendChild(multipleTextGrid);
+        const multipleTextSubmit = document.createElement('button'); multipleTextSubmit.className = 'button-confirm'; multipleTextSubmit.innerText = 'ПОДТВЕРДИТЬ';
+        multipleTextSubmit.onclick = function() {
+            if (pickedOptions.size < currentQuestionObject.correctOptions.length) { showCustomAlert("Выбери " + currentQuestionObject.correctOptions.length + " варианта!"); return; }
+            let userArray = Array.from(pickedOptions); userArray.sort(); let trueArray = []; for(let tIdx=0; tIdx<currentQuestionObject.correctOptions.length; tIdx++){trueArray.push(currentQuestionObject.correctOptions[tIdx]);} trueArray.sort();
+            let isGood = false; if (JSON.stringify(userArray) === JSON.stringify(trueArray)) { isGood = true; }
+            registerPlayerAnswer(isGood, userArray.join(', '), currentQuestionObject.correctOptions.join(', '), multipleTextSubmit);
         };
-        practArea.appendChild(mltiTxtSbmt);
+        practiceArea.appendChild(multipleTextSubmit);
     }
 }
 
-function registerPlyrAnswer(isCorrectFlg, userrrTxt, correctTxtStr, clickedDiv) {
-    if (isTransitioningBlock) {
-        return;
-    }
-    isTransitioningBlock = true;
+function registerPlayerAnswer(isCorrectFlag, userText, correctTextString, clickedElement) {
+    if (isTransitioning === true) { return; } isTransitioning = true;
+    if (isCorrectFlag === false) { globalState.mistakesCount = globalState.mistakesCount + 1; }
+    globalState.userLog.push({ question: globalState.currentQuestionList[globalState.currentQuestionIndex], userText: userText, correctText: correctTextString, isCorrect: isCorrectFlag });
     
-    if (isCorrectFlg === false) {
-        globState.misstakes = globState.misstakes + 1;
-    }
-    
-    globState.userLog.push({ 
-        question: globState.curentQList[globState.curntntIdex], 
-        userText: userrrTxt, 
-        correctText: correctTxtStr, 
-        isCorrect: isCorrectFlg 
-    });
-    
-    if (clickedDiv.tagName === 'IMG') {
-        if (isCorrectFlg) {
-            clickedDiv.style.borderColor = 'green';
-        } else {
-            clickedDiv.style.borderColor = 'red';
-        }
+    if (clickedElement.tagName === 'IMG') {
+        if (isCorrectFlag === true) { clickedElement.style.borderColor = 'green'; } else { clickedElement.style.borderColor = 'red'; }
     } else {
-        if (isCorrectFlg) {
-            clickedDiv.style.backgroundColor = 'green';
-        } else {
-            clickedDiv.style.backgroundColor = 'red';
-        }
-        clickedDiv.style.color = 'white';
+        if (isCorrectFlag === true) { clickedElement.style.backgroundColor = 'green'; } else { clickedElement.style.backgroundColor = 'red'; }
+        clickedElement.style.color = 'white';
     }
     
     setTimeout(function() {
-        isTransitioningBlock = false; 
-        globState.curntntIdex = globState.curntntIdex + 1;
-        
-        if (globState.curntntIdex >= globState.curentQList.length) {
-            calccResultt(); 
-        } else {
-            renderQuestnView();
-        }
+        isTransitioning = false; globalState.currentQuestionIndex = globalState.currentQuestionIndex + 1;
+        if (globalState.currentQuestionIndex >= globalState.currentQuestionList.length) { calculateResult(); } else { renderQuestionView(); }
     }, 600);
 }
 
-function calccResultt() {
-    let finalGrd = 5;
-    let encourgeMsg = '';
-    
-    if (globState.misstakes === 0) { 
-        finalGrd = 5; 
-        encourgeMsg = 'Ты - молодец!'; 
-    } else if (globState.misstakes === 1) { 
-        finalGrd = 4; 
-        encourgeMsg = 'Ещё немного и ты молодец!'; 
-    } else if (globState.misstakes === 2) { 
-        finalGrd = 3; 
-        encourgeMsg = 'Старайся! Всё получится!'; 
-    } else { 
-        finalGrd = 2; 
-        encourgeMsg = 'Не расстраивайся, повтори материал и попробуй снова!'; 
-    }
-
-    document.getElementById('res-mark').innerText = finalGrd;
-    document.getElementById('res-msg').innerText = encourgeMsg;
-    document.getElementById('res-err').innerText = "Ошибок: " + globState.misstakes;
-
-    const nxtLvll = document.getElementById('next-level-container');
-    nxtLvll.innerHTML = '';
-    
-    if (globState.diffLvl === 'easy') {
-        const goToMed = document.createElement('button'); 
-        goToMed.className = 'btn-sharp btn-med'; 
-        goToMed.innerText = 'Перейти на уровень Средний';
-        goToMed.onclick = function() {
-            beginPrcticeLevel('medium');
-        };
-        nxtLvll.appendChild(goToMed);
-    } else if (globState.diffLvl === 'medium') {
-        const goToHrdd = document.createElement('button'); 
-        goToHrdd.className = 'btn-sharp btn-hard'; 
-        goToHrdd.innerText = 'Перейти на уровень Сложный';
-        goToHrdd.onclick = function() {
-            beginPrcticeLevel('hard');
-        };
-        nxtLvll.appendChild(goToHrdd);
-    } else if (globState.diffLvl === 'hard') {
-        const grtzMsg = document.createElement('div'); 
-        grtzMsg.className = 'congratulations-text';
-        grtzMsg.innerText = 'Так держать! Ты прошёл самый сложный уровень! Можешь вернуться и закрепить материал или посмотреть другие предметы';
-        nxtLvll.appendChild(grtzMsg);
-    }
-
-    prepareShowAndswrs();
-    
-    let tempHist = [];
-    for (let o = 0; o < viewHistoryArray.length; o++) {
-        if (viewHistoryArray[o] !== 'screen-practice') {
-            tempHist.push(viewHistoryArray[o]);
-        }
-    }
-    viewHistoryArray = tempHist;
-    
-    changeScreenVis('screen-result');
-}
-
-function prepareShowAndswrs() {
-    const answCntnrr = document.getElementById('answers-container'); 
-    answCntnrr.innerHTML = '';
-    
-    globState.userLog.forEach(function(lgg, idxx) {
-        const blckDiv = document.createElement('div'); 
-        blckDiv.className = 'ans-item';
-        
-        let bldString = "<b>Задание " + (idxx + 1) + "</b>";
-        
-        if (lgg.question.image) {
-            bldString += '<img src="' + lgg.question.image + '" class="ans-img">';
-        }
-        
-        bldString += '<div class="ans-question">' + lgg.question.text + '</div>';
-        
-        if (lgg.question.type === 'multi-image') {
-            const cttGridy = function(picArray) {
-                let bgstr = '<div class="multi-ans-grid">';
-                picArray.forEach(function(idddd) {
-                    bgstr += '<img src="' + lgg.question.images[idddd] + '">';
-                });
-                bgstr += '</div>';
-                return bgstr;
-            };
-            
-            bldString += '<div class="ans-correct">Правильно: ' + cttGridy(lgg.correctText) + '</div>';
-            
-            let crctClss = lgg.isCorrect ? '' : 'wrong';
-            bldString += '<div class="ans-chosen ' + crctClss + '">Вы выбрали: ' + cttGridy(lgg.userText) + '</div>';
-        } else if (lgg.question.type === 'single-image') {
-            bldString += '<div class="ans-correct">Правильно: <br><img src="' + lgg.correctText + '" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid green; margin-top: 5px;"></div>';
-            
-            let crctClss2 = lgg.isCorrect ? '' : 'wrong';
-            let colrr = lgg.isCorrect ? 'green' : 'red';
-            bldString += '<div class="ans-chosen ' + crctClss2 + '">Вы выбрали: <br><img src="' + lgg.userText + '" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid ' + colrr + '; margin-top: 5px;"></div>';
-        } else {
-            bldString += '<div class="ans-correct">Верно: ' + lgg.correctText + '</div>';
-            let crctClss3 = lgg.isCorrect ? '' : 'wrong';
-            bldString += '<div class="ans-chosen ' + crctClss3 + '">Твой ответ: ' + lgg.userText + '</div>';
-        }
-        
-        blckDiv.innerHTML = bldString; 
-        answCntnrr.appendChild(blckDiv);
-    });
-}
-
-function changeScreenVis(scrnNm, backwdsFlag) {
-    if (isTransitioningBlock) {
-        return;
-    }
-    if (currntntScreen === scrnNm) {
-        return;
-    }
-    
-    isTransitioningBlock = true; 
-    fadeOvrlayElement.style.opacity = '1';
-    
-    setTimeout(function() {
-        const ddOld = document.getElementById(currntntScreen);
-        ddOld.classList.remove('active');
-        
-        if (!backwdsFlag) {
-            if (currntntScreen !== 'screen-main' && currntntScreen !== 'screen-practice') {
-                viewHistoryArray.push(currntntScreen);
+function calculateResult() {
+    let finalGrade = 0; let encouragingMessage = '';
+    if (globalState.mistakesCount === 0) { finalGrade = 5; encouragingMessage = 'Ты - молодец!'; } else {
+        if (globalState.mistakesCount === 1) { finalGrade = 4; encouragingMessage = 'Ещё немного и ты молодец!'; } else {
+            if (globalState.mistakesCount === 2) { finalGrade = 3; encouragingMessage = 'Старайся! Всё получится!'; } else {
+                finalGrade = 2; encouragingMessage = 'Не расстраивайся, повтори материал и попробуй снова!';
             }
         }
+    }
+
+    document.getElementById('result-mark').innerText = finalGrade.toString(); document.getElementById('result-message').innerText = encouragingMessage; document.getElementById('result-error-count').innerText = "Ошибок: " + globalState.mistakesCount;
+    const nextLevelContainer = document.getElementById('next-level-container'); nextLevelContainer.innerHTML = '';
+    
+    if (globalState.difficultyLevel === 'Easy') {
+        const goToMedium = document.createElement('button'); goToMedium.className = 'button-sharp button-medium'; goToMedium.innerText = 'Перейти на уровень Средний';
+        goToMedium.onclick = function() { beginPracticeLevel('Medium'); }; nextLevelContainer.appendChild(goToMedium);
+    } else if (globalState.difficultyLevel === 'Medium') {
+        const goToHard = document.createElement('button'); goToHard.className = 'button-sharp button-hard'; goToHard.innerText = 'Перейти на уровень Сложный';
+        goToHard.onclick = function() { beginPracticeLevel('Hard'); }; nextLevelContainer.appendChild(goToHard);
+    } else if (globalState.difficultyLevel === 'Hard') {
+        const congratulationsMessage = document.createElement('div'); congratulationsMessage.className = 'congratulations-text';
+        congratulationsMessage.innerText = 'Так держать! Ты прошёл самый сложный уровень! Можешь вернуться и закрепить материал или посмотреть другие предметы';
+        nextLevelContainer.appendChild(congratulationsMessage);
+    }
+
+    prepareShowAnswers();
+    let temporaryHistory = [];
+    for (let index = 0; index < viewHistoryArray.length; index++) { if (viewHistoryArray[index] !== 'screen-practice') { temporaryHistory.push(viewHistoryArray[index]); } }
+    viewHistoryArray = temporaryHistory; changeScreenVisibility('screen-result');
+}
+
+function prepareShowAnswers() {
+    const answersContainer = document.getElementById('answers-container'); answersContainer.innerHTML = '';
+    for(let logIndex=0; logIndex<globalState.userLog.length; logIndex++) {
+        let logItem = globalState.userLog[logIndex]; const blockDivision = document.createElement('div'); blockDivision.className = 'answer-item';
+        let buildString = "<b>Задание " + (logIndex + 1).toString() + "</b>";
+        if (logItem.question.image !== undefined) { buildString += '<img src="' + logItem.question.image + '" class="answer-image">'; }
+        buildString += '<div class="answer-question">' + logItem.question.text + '</div>';
         
-        currntntScreen = scrnNm; 
-        const ddNew = document.getElementById(currntntScreen);
-        ddNew.classList.add('active');
-        
-        if (scrnNm === 'screen-main') {
-            navicnsBox.classList.add('hidden');
+        if (logItem.question.type === 'multipleImage') {
+            const createGrid = function(pictureArray) {
+                let backgroundString = '<div class="multiple-answer-grid">';
+                for(let pa=0; pa<pictureArray.length; pa++) { backgroundString += '<img src="' + logItem.question.images[pictureArray[pa]] + '">'; }
+                backgroundString += '</div>'; return backgroundString;
+            };
+            buildString += '<div class="answer-correct">Правильно: ' + createGrid(logItem.correctText) + '</div>';
+            let correctClass = ""; if(logItem.isCorrect === false){correctClass="wrong";}
+            buildString += '<div class="answer-chosen ' + correctClass + '">Вы выбрали: ' + createGrid(logItem.userText) + '</div>';
+        } else if (logItem.question.type === 'singleImage') {
+            buildString += '<div class="answer-correct">Правильно: <br><img src="' + logItem.correctText + '" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid green; margin-top: 5px;"></div>';
+            let correctClass = ""; if(logItem.isCorrect===false){correctClass="wrong";} let colorString = "red"; if(logItem.isCorrect===true){colorString="green";}
+            buildString += '<div class="answer-chosen ' + correctClass + '">Вы выбрали: <br><img src="' + logItem.userText + '" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid ' + colorString + '; margin-top: 5px;"></div>';
         } else {
-            navicnsBox.classList.remove('hidden');
+            buildString += '<div class="answer-correct">Верно: ' + logItem.correctText + '</div>';
+            let correctClass = ""; if(logItem.isCorrect===false){correctClass="wrong";}
+            buildString += '<div class="answer-chosen ' + correctClass + '">Твой ответ: ' + logItem.userText + '</div>';
         }
-        
-        fadeOvrlayElement.style.opacity = '0'; 
-        isTransitioningBlock = false;
+        blockDivision.innerHTML = buildString; answersContainer.appendChild(blockDivision);
+    }
+}
+
+function changeScreenVisibility(screenName, isBackwardsNavigation) {
+    if (isTransitioning === true) { return; } if (currentScreen === screenName) { return; }
+    isTransitioning = true; fadeOverlayElement.style.opacity = '1';
+    
+    setTimeout(function() {
+        const oldScreen = document.getElementById(currentScreen); oldScreen.classList.remove('active');
+        if (isBackwardsNavigation !== true) { if (currentScreen !== 'screen-main' && currentScreen !== 'screen-practice') { viewHistoryArray.push(currentScreen); } }
+        currentScreen = screenName; const newScreen = document.getElementById(currentScreen); newScreen.classList.add('active');
+        if (screenName === 'screen-main') { navigationIconsBox.classList.add('hidden'); } else { navigationIconsBox.classList.remove('hidden'); }
+        fadeOverlayElement.style.opacity = '0'; isTransitioning = false;
     }, 500);
 }
 
-function gobackHistory() { 
-    if (currntntScreen === 'screen-answers') {
-        changeScreenVis('screen-result', true);
-    } else if (currntntScreen === 'screen-result') {
-        let tempHist2 = [];
-        for (let b = 0; b < viewHistoryArray.length; b++) {
-            if (viewHistoryArray[b] !== 'screen-practice') {
-                tempHist2.push(viewHistoryArray[b]);
-            }
+function goBackInHistory() { 
+    if (currentScreen === 'screen-answers') { changeScreenVisibility('screen-result', true); } else {
+        if (currentScreen === 'screen-result') {
+            let temporaryHistory = []; for (let index = 0; index < viewHistoryArray.length; index++) { if (viewHistoryArray[index] !== 'screen-practice') { temporaryHistory.push(viewHistoryArray[index]); } }
+            viewHistoryArray = temporaryHistory; changeScreenVisibility('screen-difficulty', true);
+        } else {
+            if (viewHistoryArray.length > 0) { let poppedScreen = viewHistoryArray.pop(); changeScreenVisibility(poppedScreen, true); } else { goHome(); }
         }
-        viewHistoryArray = tempHist2;
-        changeScreenVis('screen-diff', true);
-    } else if (viewHistoryArray.length > 0) {
-        let ppped = viewHistoryArray.pop();
-        changeScreenVis(ppped, true);
-    } else {
-        goHommme();
     }
 }
 
-function goHommme() { 
-    viewHistoryArray = []; 
-    changeScreenVis('screen-main'); 
-}
+function goHome() { viewHistoryArray = new Array(); changeScreenVisibility('screen-main'); }
 
-window.addEventListener('resize', function() {
-   let rrs = 0;
-   rrs = rrs + 1;
-});
+window.addEventListener('resize', function() { let resizeCounter = 0; while(resizeCounter < 1) { resizeCounter = resizeCounter + 1; } });
 
