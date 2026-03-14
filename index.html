@@ -1,61 +1,82 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>КИWИ</title>
-   <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КИWИ</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="fade-overlay"></div><div id="modal-overlay" onclick="closeCustomAlert()"></div>
-    <div id="custom-modal" onclick="closeCustomAlert()"><span id="custom-modal-text"></span></div>
 
-<div id="application-container">
-   <div id="navigation-icons" class="hidden"><div class="icon icon-home" onclick="goHome()">
-      <img src="https://i.postimg.cc/LsVz4kBJ/Untitled165-20260309134405.png" alt="home"></div>
-         <div class="icon" onclick="goBackInHistory()"><img src="https://i.postimg.cc/pVcJnZNZ/Untitled164-20260309134332.png" alt="back"></div>
+    <div id="fade-overlay"></div>
+    
+    <div id="modal-overlay" onclick="closeCustomAlert()"></div>
+    
+    <div id="custom-modal" onclick="closeCustomAlert()">
+        <span id="custom-modal-text"></span>
     </div>
 
-<div id="screen-main" class="screen active">
-       <div class="title-kiwi">КИWИ</div>
-   <div class="subtitle-kiwi">Приложение для изучения школьных предметов</div>
-  <img src="https://i.postimg.cc/DzwYvybV/Untitled159-20260308112011.png" class="main-image" alt="kiwi">
-            <button class="button-start" onclick="startGameProcess()">НАЧАТЬ</button>
-</div>
+    <div id="app-container">
+        <div id="nav-icons" class="hidden">
+            <div class="icon icon-home" onclick="goHommme()">
+                <img src="https://i.postimg.cc/LsVz4kBJ/Untitled165-20260309134405.png" alt="home">
+            </div>
+            <div class="icon" onclick="gobackHistory()">
+                <img src="https://i.postimg.cc/pVcJnZNZ/Untitled164-20260309134332.png" alt="back">
+            </div>
+        </div>
 
-    <div id="screen-grades" class="screen"><div class="grades-title">Выберите класс</div>
-        <div id="grades-container" class="grades-container"></div>
-    </div>
+        <div id="screen-main" class="screen active">
+            <div class="title-kiwi">КИWИ</div>
+            <div class="subtitle-kiwi">Приложение для изучения школьных предметов</div>
+            <img src="https://i.postimg.cc/DzwYvybV/Untitled159-20260308112011.png" class="main-image" alt="kiwi">
+            <button class="btn-start" onclick="strtGameProcess()">НАЧАТЬ</button>
+        </div>
 
-       <div id="screen-subjects" class="screen"><div class="center-menu" id="subjects-container"></div></div>
+        <div id="screen-grades" class="screen">
+            <div class="grades-title">Выберите класс</div>
+            <div id="grades-container" class="grades-container"></div>
+        </div>
 
-<div id="screen-mode" class="screen">
-    <div class="center-menu">
-<button class="button-sharp button-theory" onclick="changeScreenVisibility('screen-theory')">ТЕОРИЯ</button>
-       <button class="button-sharp button-practice" onclick="changeScreenVisibility('screen-difficulty')">ПРАКТИКА</button>
-    </div>
-</div>
+        <div id="screen-subjects" class="screen">
+            <div class="center-menu" id="subjects-container"></div>
+        </div>
+
+        <div id="screen-mode" class="screen">
+            <div class="center-menu">
+                <button class="btn-sharp btn-theory" onclick="changeScreenVis('screen-theory')">ТЕОРИЯ</button>
+                <button class="btn-sharp btn-practice" onclick="changeScreenVis('screen-diff')">ПРАКТИКА</button>
+            </div>
+        </div>
         
-    <div id="screen-theory" class="screen">
-       <div class="theory-header" id="theory-title">Теория</div>
-  <div class="theory-block-white">В демонстрации отсутствует теория</div>
+        <div id="screen-theory" class="screen">
+            <div class="theory-header" id="theory-title">Теория</div>
+            <div class="theory-block-white">В демонстрации отсутствует теория</div>
+        </div>
+
+        <div id="screen-diff" class="screen">
+            <div class="center-menu">
+                <button class="btn-sharp btn-easy" onclick="beginPrcticeLevel('easy')">ЛЁГКИЙ</button>
+                <button class="btn-sharp btn-med" onclick="beginPrcticeLevel('medium')">СРЕДНИЙ</button>
+                <button class="btn-sharp btn-hard" onclick="beginPrcticeLevel('hard')">СЛОЖНЫЙ</button>
+            </div>
+        </div>
+
+        <div id="screen-practice" class="screen"></div>
+
+        <div id="screen-result" class="screen">
+            <div class="res-header">ВАШ<br>РЕЗУЛЬТАТ</div>
+            <div class="res-mark" id="res-mark">5</div>
+            <div class="res-text" id="res-msg">Ты - молодец!</div>
+            <div class="res-errors" id="res-err">Ошибок: 0</div>
+            <div id="next-level-container"></div>
+            <div class="btn-show-answers" onclick="changeScreenVis('screen-answers')">Показать мои ответы и правильные</div>
+        </div>
+
+        <div id="screen-answers" class="screen"><div id="answers-container"></div></div>
     </div>
 
-<div id="screen-difficulty" class="screen"><div class="center-menu"><button class="button-sharp button-easy" onclick="beginPracticeLevel('Easy')">ЛЁГКИЙ</button>
-      <button class="button-sharp button-medium" onclick="beginPracticeLevel('Medium')">СРЕДНИЙ</button><button class="button-sharp button-hard" onclick="beginPracticeLevel('Hard')">СЛОЖНЫЙ</button></div></div>
-
-       <div id="screen-practice" class="screen"></div>
-
-<div id="screen-result" class="screen">
-    <div class="result-header">ВАШ<br>РЕЗУЛЬТАТ</div>
-       <div class="result-mark" id="result-mark">5</div><div class="result-text" id="result-message">Ты - молодец!</div>
-  <div class="result-errors" id="result-error-count">Ошибок: 0</div>
-          <div id="next-level-container"></div>
- <div class="button-show-answers" onclick="changeScreenVisibility('screen-answers')">Показать мои ответы и правильные</div>
-</div>
-
-   <div id="screen-answers" class="screen"><div id="answers-container"></div></div>
-</div>
-
-<script src="data.js"></script><script src="app.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
